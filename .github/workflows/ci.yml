@@ -1,23 +1,35 @@
-name: CI pipeline
+name: CI
 
-on: [push]
+on:
+  push:
+    branches: [ master ]
+  pull_request:
+    branches: [ master ]
 
 jobs:
-  build:
-    name: continuous-integration
+  test:
     runs-on: ubuntu-latest
 
     steps:
-      - uses: actions/checkout@v6
+      - name: Check out the code
+        uses: actions/checkout@v4
 
-      - name: Install uv and set the python version
-        uses: astral-sh/setup-uv@v7
+      - name: Set up Python
+        uses: actions/setup-python@v5
         with:
-          activate-environment: true
-          python-version: 3.13
+          python-version: '3.13'
 
-      - name: Install deps
-        run: uv sync --extra dev
+      - name: Install dependencies
+        run: |
+          pip install -r requirements.txt
+          pip install -r requirements-dev.txt
 
-      - name: Check code
-        run: ruff check
+      - name: Run migrations check
+        run: python source/manage.py makemigrations --check --dry-run
+        env:
+          DJANGO_SETTINGS_MODULE: app.conf.development.settings
+
+      - name: Run tests
+        run: python source/manage.py test
+        env:
+          DJANGO_SETTINGS_MODULE: app.conf.development.settings
