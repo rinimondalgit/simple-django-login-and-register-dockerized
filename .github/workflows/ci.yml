@@ -25,13 +25,13 @@ jobs:
           pip install -r requirements-dev.txt
 
       - name: Run migrations check
-              working-directory: source
-        run: python source/manage.py makemigrations --check --dry-run
+        working-directory: source
+        run: python manage.py makemigrations --check --dry-run
         env:
           DJANGO_SETTINGS_MODULE: app.conf.development.settings
 
       - name: Run tests
-              working-directory: source
-        run: python source/manage.py test
+        working-directory: source
+        run: python manage.py test -v 2
         env:
           DJANGO_SETTINGS_MODULE: app.conf.development.settings
